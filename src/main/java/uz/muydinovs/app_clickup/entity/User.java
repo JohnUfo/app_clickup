@@ -35,6 +35,8 @@ public class User extends AbsUUIDEntity implements UserDetails {
     @OneToOne(fetch = FetchType.LAZY)
     private Attachment avatar;
 
+    private String emailCode;
+
     private boolean enabled = false;
     private boolean accountNonExpired = true;
     private boolean credentialsNonExpired = true;
@@ -42,6 +44,14 @@ public class User extends AbsUUIDEntity implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private SystemRoleName systemRoleName;
+
+    public User(String fullName, String email, String password, SystemRoleName systemRoleName,String emailCode) {
+        this.fullName = fullName;
+        this.email = email;
+        this.password = password;
+        this.systemRoleName = systemRoleName;
+        this.emailCode = emailCode;
+    }
 
 
     @Override
