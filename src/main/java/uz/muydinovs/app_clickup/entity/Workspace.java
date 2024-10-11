@@ -1,9 +1,6 @@
 package uz.muydinovs.app_clickup.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,12 +11,14 @@ import uz.muydinovs.app_clickup.entity.template.AbsLongEntity;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "users_workspaces")
+@Entity(name = "workspace")
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "owner_id"})})
 public class Workspace extends AbsLongEntity {
 
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private String color;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -30,4 +29,17 @@ public class Workspace extends AbsLongEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Attachment avatar;
+
+    public Workspace(String name, String color, User owner, Attachment avatar) {
+        this.name = name;
+        this.color = color;
+        this.owner = owner;
+        this.avatar = avatar;
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void setInitialLetterMyMethod() {
+        this.initialLetter = name.substring(0, 1);
+    }
 }
