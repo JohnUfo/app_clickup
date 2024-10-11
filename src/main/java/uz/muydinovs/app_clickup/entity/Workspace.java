@@ -14,7 +14,7 @@ import uz.muydinovs.app_clickup.entity.template.AbsLongEntity;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Entity(name = "users_workspaces")
 public class Workspace extends AbsLongEntity {
 
     @Column(nullable = false)

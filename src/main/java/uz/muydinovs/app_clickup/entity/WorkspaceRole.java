@@ -24,6 +24,4 @@ public class WorkspaceRole extends AbsUUIDEntity {
 
     @Enumerated(EnumType.STRING)
     private WorkspaceRoleName extendsRole; //add member, remove member
-
-
 }
