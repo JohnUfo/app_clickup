@@ -38,8 +38,8 @@ public class AuthService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return null;
+    public UserDetails loadUserByUsername(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
     }
 
     public ApiResponse registerUser(RegisterDto registerDto) {
@@ -77,18 +77,18 @@ public class AuthService implements UserDetailsService {
     }
 
     public ApiResponse verifyEmail(String email, String emailCode) {
-        Optional<User> optionalUser = userRepository.findByEmailAndEmailCode(email, emailCode);
+        Optional<User> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            user.setEnabled(true);
-            user.setEmailCode(null);
-            userRepository.save(user);
-            return new ApiResponse("Account verified!", true);
-        }
-        return new ApiResponse("Account already verified!", false);
-    }
+            if (emailCode.equals(user.getEmailCode())) {
 
-    public ApiResponse login(LoginDto loginDto) {
-        return null;
+                user.setEnabled(true);
+                user.setEmailCode(null);
+                userRepository.save(user);
+                return new ApiResponse("Account verified!", true);
+            }
+            return new ApiResponse("Invalid email code", false);
+        }
+        return new ApiResponse("User not found", false);
     }
 }
