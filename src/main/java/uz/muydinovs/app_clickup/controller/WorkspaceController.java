@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import uz.muydinovs.app_clickup.entity.User;
 import uz.muydinovs.app_clickup.entity.Workspace;
 import uz.muydinovs.app_clickup.payload.ApiResponse;
+import uz.muydinovs.app_clickup.payload.MemberDto;
 import uz.muydinovs.app_clickup.payload.WorkspaceDto;
 import uz.muydinovs.app_clickup.security.CurrentUser;
 import uz.muydinovs.app_clickup.service.WorkspaceService;
@@ -46,4 +47,9 @@ public class WorkspaceController {
         return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 
+    @PostMapping("/addOrEditOrRemove/{id}")
+    public HttpEntity<?> addOrEditWorkspace(@PathVariable Long id, @RequestBody MemberDto memberDto) {
+        ApiResponse apiResponse = workspaceService.addOrEditWorkspace(id,memberDto);
+        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
+    }
 }

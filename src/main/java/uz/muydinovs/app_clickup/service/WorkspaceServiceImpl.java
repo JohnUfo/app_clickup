@@ -8,6 +8,7 @@ import uz.muydinovs.app_clickup.entity.*;
 import uz.muydinovs.app_clickup.entity.enums.WorkspacePermissionName;
 import uz.muydinovs.app_clickup.entity.enums.WorkspaceRoleName;
 import uz.muydinovs.app_clickup.payload.ApiResponse;
+import uz.muydinovs.app_clickup.payload.MemberDto;
 import uz.muydinovs.app_clickup.payload.WorkspaceDto;
 import uz.muydinovs.app_clickup.repository.*;
 
@@ -48,13 +49,26 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         WorkspaceRole ownerRole = workspaceRoleRepository.save(new WorkspaceRole(workspace, WorkspaceRoleName.ROLE_OWNER.name(), null));
 
+        WorkspaceRole adminRole = workspaceRoleRepository.save(new WorkspaceRole(workspace, WorkspaceRoleName.ROLE_ADMIN.name(), null));
+        WorkspaceRole memberRole = workspaceRoleRepository.save(new WorkspaceRole(workspace, WorkspaceRoleName.ROLE_MEMBER.name(), null));
+        WorkspaceRole guestRole = workspaceRoleRepository.save(new WorkspaceRole(workspace, WorkspaceRoleName.ROLE_GUEST.name(), null));
+
         WorkspacePermissionName[] workspacePermissionNames = WorkspacePermissionName.values();
 
         List<WorkspacePermission> workspacePermissions = new ArrayList<>();
 
         for (WorkspacePermissionName workspacePermissionName : workspacePermissionNames) {
-            WorkspacePermission workspacePermission = new WorkspacePermission(ownerRole, workspacePermissionName);
-            workspacePermissions.add(workspacePermission);
+            WorkspacePermission workspacePermissionOwner = new WorkspacePermission(ownerRole, workspacePermissionName);
+            workspacePermissions.add(workspacePermissionOwner);
+            if (workspacePermissionName.getWorkspaceRoleNames().contains(WorkspaceRoleName.ROLE_ADMIN)) {
+                workspacePermissions.add(new WorkspacePermission(adminRole, workspacePermissionName));
+            }
+            if (workspacePermissionName.getWorkspaceRoleNames().contains(WorkspaceRoleName.ROLE_MEMBER)) {
+                workspacePermissions.add(new WorkspacePermission(memberRole, workspacePermissionName));
+            }
+            if (workspacePermissionName.getWorkspaceRoleNames().contains(WorkspaceRoleName.ROLE_GUEST)) {
+                workspacePermissions.add(new WorkspacePermission(guestRole, workspacePermissionName));
+            }
         }
 
         workspacePermissionRepository.saveAll(workspacePermissions);
@@ -79,11 +93,6 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     public ApiResponse changeOwnerWorkspace(Long id, UUID ownerId) {
-        if (!workSpaceRepository.existsById(id)) {
-            return new ApiResponse("Workspace not found", false);
-        }
-//        Workspace workspace = workSpaceRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("workspace"));
-//        workspace.setOwner();
         return null;
     }
 
@@ -94,5 +103,10 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         }
         workSpaceRepository.deleteById(id);
         return new ApiResponse("Workspace deleted", true);
+    }
+
+    @Override
+    public ApiResponse addOrEditWorkspace(Long id, MemberDto memberDto) {
+        return null;
     }
 }

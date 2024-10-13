@@ -49,8 +49,17 @@ public enum WorkspacePermissionName {
 
     CAN_CHANGE_PERMISSION("CAN_CHANGE_PERMISSION", Arrays.asList(WorkspaceRoleName.ROLE_OWNER, WorkspaceRoleName.ROLE_ADMIN));
 
-    public String name;
-    public List<WorkspaceRoleName> workspaceRoleNames;
+    public String getName() {
+        return name;
+    }
+
+    public List<WorkspaceRoleName> getWorkspaceRoleNames() {
+        return workspaceRoleNames;
+    }
+
+
+    private String name;
+    private List<WorkspaceRoleName> workspaceRoleNames;
 
     WorkspacePermissionName(String name, List<WorkspaceRoleName> workspaceRoleNames) {
         this.name = name;
