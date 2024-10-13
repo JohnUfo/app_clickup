@@ -15,6 +15,7 @@ import uz.muydinovs.app_clickup.repository.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -105,7 +106,6 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         return new ApiResponse("Workspace deleted", true);
     }
 
-
     //TODO to invite email for user
     @Override
     public ApiResponse addOrEditOrRemoveMemberFromWorkspace(Long id, MemberDto memberDto) {
@@ -131,5 +131,18 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             }
         }
         return new ApiResponse("Success", true);
+    }
+
+    @Override
+    public ApiResponse joinToWorkspace(Long id, User user) {
+        Optional<WorkspaceUser> optionalWorkspaceUser = workspaceUserRepository.findByWorkspaceIdAndUserId(id, user.getId());
+        if (optionalWorkspaceUser.isPresent()) {
+            WorkspaceUser workspaceUser = optionalWorkspaceUser.get();
+            workspaceUser.setDate_joined(new Timestamp(System.currentTimeMillis()));
+            workspaceUserRepository.save(workspaceUser);
+            return new ApiResponse("Success", true);
+        }
+
+        return new ApiResponse("Failed", false);
     }
 }

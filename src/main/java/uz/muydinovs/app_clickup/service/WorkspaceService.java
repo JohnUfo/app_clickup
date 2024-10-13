@@ -18,4 +18,5 @@ public interface WorkspaceService {
 
     ApiResponse addOrEditOrRemoveMemberFromWorkspace(Long id, MemberDto memberDto);
 
+    ApiResponse joinToWorkspace(Long id, User user);
 }

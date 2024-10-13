@@ -50,4 +50,10 @@ public class WorkspaceController {
         ApiResponse apiResponse = workspaceService.addOrEditOrRemoveMemberFromWorkspace(id,memberDto);
         return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
+
+    @PutMapping("/join")
+    public HttpEntity<?> joinToWorkspace(@RequestParam Long id, @CurrentUser User user) {
+        ApiResponse apiResponse = workspaceService.joinToWorkspace(id,user);
+        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
+    }
 }
