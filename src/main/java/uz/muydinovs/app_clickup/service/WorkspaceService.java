@@ -12,13 +12,13 @@ public interface WorkspaceService {
 
     ApiResponse editWorkspace(Long id, WorkspaceDto workspaceDto);
 
-    ApiResponse changeOwnerWorkspace(Long id, UUID ownerId);
+    ApiResponse changeOwnerWorkspace(Long workspaceId, UUID ownerId, User user);
 
     ApiResponse deleteWorkspace(Long id);
 
-    ApiResponse addOrEditOrRemoveMemberFromWorkspace(Long id, MemberDto memberDto);
+    ApiResponse addOrEditOrRemoveMemberFromWorkspace(Long workspaceId, MemberDto memberDto);
 
     ApiResponse joinToWorkspace(Long id, User user);
 
-    ApiResponse addRoleToWorkspace(Long id, String roleName,User user);
+    ApiResponse addRoleToWorkspace(Long workspaceId, String roleName,User user);
 }

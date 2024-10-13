@@ -33,9 +33,9 @@ public class WorkspaceController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @PutMapping("/changeOwner/{id}")
-    public HttpEntity<?> changeOwnerWorkspace(@PathVariable Long id, @RequestParam UUID ownerId) {
-        ApiResponse apiResponse = workspaceService.changeOwnerWorkspace(id, ownerId);
+    @PutMapping("/changeOwner/{workspaceId}")
+    public HttpEntity<?> changeOwnerWorkspace(@PathVariable Long workspaceId, @RequestParam UUID ownerId, @CurrentUser User user) {
+        ApiResponse apiResponse = workspaceService.changeOwnerWorkspace(workspaceId, ownerId,user);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -45,9 +45,9 @@ public class WorkspaceController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @PostMapping("/addOrEditOrRemoveMemberFromWorkspace/{id}")
-    public HttpEntity<?> addOrEditOrRemoveMemberFromWorkspace(@PathVariable Long id, @RequestBody MemberDto memberDto) {
-        ApiResponse apiResponse = workspaceService.addOrEditOrRemoveMemberFromWorkspace(id, memberDto);
+    @PostMapping("/addOrEditOrRemoveMemberFromWorkspace/{workspaceId}")
+    public HttpEntity<?> addOrEditOrRemoveMemberFromWorkspace(@PathVariable Long workspaceId, @RequestBody MemberDto memberDto) {
+        ApiResponse apiResponse = workspaceService.addOrEditOrRemoveMemberFromWorkspace(workspaceId, memberDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -57,9 +57,10 @@ public class WorkspaceController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @PostMapping("/addRole/{id}")//workspaceId
-    public HttpEntity<?> addRoleToWorkspace(@PathVariable Long id, @RequestParam String roleName,@CurrentUser User user) {
-        ApiResponse apiResponse = workspaceService.addRoleToWorkspace(id, roleName,user);
+    @PostMapping("/addRole/{workspaceId}")//workspaceId
+    public HttpEntity<?> addRoleToWorkspace(@PathVariable Long workspaceId, @RequestParam String roleName,@CurrentUser User user) {
+        ApiResponse apiResponse = workspaceService.addRoleToWorkspace(workspaceId, roleName,user);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
 }

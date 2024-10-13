@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import uz.muydinovs.app_clickup.entity.*;
-import uz.muydinovs.app_clickup.entity.enums.SystemRoleName;
 import uz.muydinovs.app_clickup.entity.enums.WorkspacePermissionName;
 import uz.muydinovs.app_clickup.entity.enums.WorkspaceRoleName;
 import uz.muydinovs.app_clickup.payload.ApiResponse;
@@ -94,8 +93,21 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public ApiResponse changeOwnerWorkspace(Long id, UUID ownerId) {
-        return null;
+    public ApiResponse changeOwnerWorkspace(Long workspaceId, UUID newOwnerId, User user) {
+        if (newOwnerId.equals(user.getId())) return new ApiResponse("User ids are same", false);
+
+        Optional<Workspace> optionalWorkspace = workSpaceRepository.findById(workspaceId);
+        if (optionalWorkspace.isPresent() && optionalWorkspace.get().getOwner().equals(user)) {
+            Workspace workspace = optionalWorkspace.get();
+            Optional<User> optionalUser = userRepository.findById(newOwnerId);
+            if (optionalUser.isPresent()) {
+                workspace.setOwner(optionalUser.get());
+                workSpaceRepository.save(workspace);
+                return new ApiResponse("Workspace owner is changed", true);
+            }
+            return new ApiResponse("User not found", false);
+        }
+        return new ApiResponse("workspace or user id is not correct", false);
     }
 
     @Override
@@ -109,26 +121,20 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     //TODO to invite email for user
     @Override
-    public ApiResponse addOrEditOrRemoveMemberFromWorkspace(Long id, MemberDto memberDto) {
+    public ApiResponse addOrEditOrRemoveMemberFromWorkspace(Long workspaceId, MemberDto memberDto) {
         switch (memberDto.getAddType()) {
             case ADD -> {
-                WorkspaceUser workspaceUser = new WorkspaceUser(
-                        workSpaceRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("id")),
-                        userRepository.findById(memberDto.getId()).orElseThrow(() -> new ResourceNotFoundException("id")),
-                        workspaceRoleRepository.findById(memberDto.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("id")),
-                        new Timestamp(System.currentTimeMillis()),
-                        null
-                );
+                WorkspaceUser workspaceUser = new WorkspaceUser(workSpaceRepository.findById(workspaceId).orElseThrow(() -> new ResourceNotFoundException("id")), userRepository.findById(memberDto.getId()).orElseThrow(() -> new ResourceNotFoundException("id")), workspaceRoleRepository.findById(memberDto.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("id")), new Timestamp(System.currentTimeMillis()), null);
                 workspaceUserRepository.save(workspaceUser);
             }
             case EDIT -> {
-                WorkspaceUser workspaceUser = workspaceUserRepository.findByWorkspaceIdAndUserId(id, memberDto.getId()).orElseGet(WorkspaceUser::new);
+                WorkspaceUser workspaceUser = workspaceUserRepository.findByWorkspaceIdAndUserId(workspaceId, memberDto.getId()).orElseGet(WorkspaceUser::new);
                 workspaceUser.setWorkspaceRole(workspaceRoleRepository.findById(memberDto.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("id")));
 
                 workspaceUserRepository.save(workspaceUser);
             }
             case REMOVE -> {
-                workspaceUserRepository.deleteByWorkspaceIdAndUserId(id, memberDto.getId());
+                workspaceUserRepository.deleteByWorkspaceIdAndUserId(workspaceId, memberDto.getId());
             }
         }
         return new ApiResponse("Success", true);
@@ -148,23 +154,23 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public ApiResponse addRoleToWorkspace(Long id, String roleName, User user) {
+    public ApiResponse addRoleToWorkspace(Long workspaceId, String roleName, User user) {
         //workspace user orqali workspacerolni olamiz
         //new role qoshvotgan odam admin yoki owner tekshiramiz
-        Optional<WorkspaceUser> optionalWorkspaceUser = workspaceUserRepository.findByWorkspaceIdAndUserId(id, user.getId());
+        Optional<WorkspaceUser> optionalWorkspaceUser = workspaceUserRepository.findByWorkspaceIdAndUserId(workspaceId, user.getId());
         if (optionalWorkspaceUser.isPresent()) {
             WorkspaceUser workspaceUser = optionalWorkspaceUser.get();
             if (workspaceUser.getWorkspaceRole().getName().equals(WorkspaceRoleName.ROLE_OWNER.name()) || workspaceUser.getWorkspaceRole().getName().equals(WorkspaceRoleName.ROLE_ADMIN.name())) {
                 //admin yoki ownerligini bilganimizdan keyin workspace_rolega nameni qoshamiz qoshamiz
                 //workspaceni id orqali ovolish kere keyin repositoryga save qivotganda bervoraman
-                Optional<Workspace> optionalWorkspace = workSpaceRepository.findById(id);
+                Optional<Workspace> optionalWorkspace = workSpaceRepository.findById(workspaceId);
                 if (optionalWorkspace.isPresent()) {
                     workspaceRoleRepository.save(new WorkspaceRole(optionalWorkspace.get(), roleName, null));
                     return new ApiResponse("Successfully " + roleName + " added to workspace role", true);
                 }
                 return new ApiResponse("workspace is not exist", false);
             }
-            return new ApiResponse("Only owner and admin can add new role to workspace",false);
+            return new ApiResponse("Only owner and admin can add new role to workspace", false);
         }
         return new ApiResponse("wrong user id", false);
     }
