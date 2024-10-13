@@ -16,6 +16,6 @@ public interface WorkspaceService {
 
     ApiResponse deleteWorkspace(Long id);
 
-    ApiResponse addOrEditWorkspace(Long id, MemberDto memberDto);
+    ApiResponse addOrEditOrRemoveMemberFromWorkspace(Long id, MemberDto memberDto);
 
 }

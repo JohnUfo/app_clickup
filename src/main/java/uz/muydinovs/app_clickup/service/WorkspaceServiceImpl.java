@@ -105,8 +105,31 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         return new ApiResponse("Workspace deleted", true);
     }
 
+
+    //TODO to invite email for user
     @Override
-    public ApiResponse addOrEditWorkspace(Long id, MemberDto memberDto) {
-        return null;
+    public ApiResponse addOrEditOrRemoveMemberFromWorkspace(Long id, MemberDto memberDto) {
+        switch (memberDto.getAddType()) {
+            case ADD -> {
+                WorkspaceUser workspaceUser = new WorkspaceUser(
+                        workSpaceRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("id")),
+                        userRepository.findById(memberDto.getId()).orElseThrow(() -> new ResourceNotFoundException("id")),
+                        workspaceRoleRepository.findById(memberDto.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("id")),
+                        new Timestamp(System.currentTimeMillis()),
+                        null
+                );
+                workspaceUserRepository.save(workspaceUser);
+            }
+            case EDIT -> {
+                WorkspaceUser workspaceUser = workspaceUserRepository.findByWorkspaceIdAndUserId(id, memberDto.getId()).orElseGet(WorkspaceUser::new);
+                workspaceUser.setWorkspaceRole(workspaceRoleRepository.findById(memberDto.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("id")));
+
+                workspaceUserRepository.save(workspaceUser);
+            }
+            case REMOVE -> {
+                workspaceUserRepository.deleteByWorkspaceIdAndUserId(id, memberDto.getId());
+            }
+        }
+        return new ApiResponse("Success", true);
     }
 }

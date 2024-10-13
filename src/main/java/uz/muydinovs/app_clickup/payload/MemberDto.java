@@ -1,6 +1,7 @@
 package uz.muydinovs.app_clickup.payload;
 
 import lombok.Data;
+import uz.muydinovs.app_clickup.entity.enums.AddType;
 
 import java.util.UUID;
 
@@ -8,7 +9,7 @@ import java.util.UUID;
 public class MemberDto {
     private UUID id;
 
-    private UUID RoleId;
+    private UUID roleId;
 
-    private String addType;//ADD, EDIT, DELETE
+    private AddType addType;//ADD, EDIT, DELETE
 }

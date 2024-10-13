@@ -2,12 +2,10 @@ package uz.muydinovs.app_clickup.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.muydinovs.app_clickup.entity.User;
-import uz.muydinovs.app_clickup.entity.Workspace;
 import uz.muydinovs.app_clickup.payload.ApiResponse;
 import uz.muydinovs.app_clickup.payload.MemberDto;
 import uz.muydinovs.app_clickup.payload.WorkspaceDto;
@@ -30,7 +28,7 @@ public class WorkspaceController {
     }
 
     @PutMapping("/{id}")
-    public HttpEntity<?> addWorkspace(@PathVariable Long id, @RequestBody WorkspaceDto workspaceDto) {
+    public HttpEntity<?> editWorkspace(@PathVariable Long id, @RequestBody WorkspaceDto workspaceDto) {
         ApiResponse apiResponse = workspaceService.editWorkspace(id,workspaceDto);
         return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
@@ -47,9 +45,9 @@ public class WorkspaceController {
         return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 
-    @PostMapping("/addOrEditOrRemove/{id}")
-    public HttpEntity<?> addOrEditWorkspace(@PathVariable Long id, @RequestBody MemberDto memberDto) {
-        ApiResponse apiResponse = workspaceService.addOrEditWorkspace(id,memberDto);
+    @PostMapping("/addOrEditOrRemoveMemberFromWorkspace/{id}")
+    public HttpEntity<?> addOrEditOrRemoveMemberFromWorkspace(@PathVariable Long id, @RequestBody MemberDto memberDto) {
+        ApiResponse apiResponse = workspaceService.addOrEditOrRemoveMemberFromWorkspace(id,memberDto);
         return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
     }
 }
