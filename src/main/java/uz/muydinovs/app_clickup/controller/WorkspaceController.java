@@ -27,9 +27,9 @@ public class WorkspaceController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @PutMapping("/{id}")
-    public HttpEntity<?> editWorkspace(@PathVariable Long id, @RequestBody WorkspaceDto workspaceDto) {
-        ApiResponse apiResponse = workspaceService.editWorkspace(id, workspaceDto);
+    @PutMapping("/{workspaceId}")
+    public HttpEntity<?> editWorkspace(@PathVariable Long workspaceId, @RequestBody WorkspaceDto workspaceDto,@CurrentUser User user) {
+        ApiResponse apiResponse = workspaceService.editWorkspace(workspaceId, workspaceDto,user);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -62,5 +62,4 @@ public class WorkspaceController {
         ApiResponse apiResponse = workspaceService.addRoleToWorkspace(workspaceId, roleName,user);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
 }

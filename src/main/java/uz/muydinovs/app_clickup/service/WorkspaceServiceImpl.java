@@ -80,16 +80,20 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public ApiResponse editWorkspace(Long id, WorkspaceDto workspaceDto) {
-        //name,color,avatar
-        if (!workSpaceRepository.existsById(id)) {
+    public ApiResponse editWorkspace(Long workspaceId, WorkspaceDto workspaceDto, User user) {
+        Optional<Workspace> optionalWorkspace = workSpaceRepository.findById(workspaceId);
+        if (optionalWorkspace.isEmpty()) {
             return new ApiResponse("Workspace not found", false);
         }
-        Workspace workspace = workSpaceRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("workspace"));
-        workspace.setName(workspaceDto.getName());
-        workspace.setColor(workspaceDto.getColor());
-        workSpaceRepository.save(workspace);
-        return null;
+        Workspace workspace = optionalWorkspace.get();
+        if (workspace.getOwner().equals(user)) {
+            workspace.setName(workspaceDto.getName());
+            workspace.setColor(workspaceDto.getColor());
+            workspace.setAvatar(workspace.getAvatar());
+            workSpaceRepository.save(workspace);
+            return new ApiResponse("Workspace updated", true);
+        }
+        return new ApiResponse("this user is not workspace owner", false);
     }
 
     @Override
