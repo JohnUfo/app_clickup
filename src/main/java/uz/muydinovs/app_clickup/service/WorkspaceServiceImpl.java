@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import uz.muydinovs.app_clickup.entity.*;
+import uz.muydinovs.app_clickup.entity.enums.SystemRoleName;
 import uz.muydinovs.app_clickup.entity.enums.WorkspacePermissionName;
 import uz.muydinovs.app_clickup.entity.enums.WorkspaceRoleName;
 import uz.muydinovs.app_clickup.payload.ApiResponse;
@@ -144,5 +145,27 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         }
 
         return new ApiResponse("Failed", false);
+    }
+
+    @Override
+    public ApiResponse addRoleToWorkspace(Long id, String roleName, User user) {
+        //workspace user orqali workspacerolni olamiz
+        //new role qoshvotgan odam admin yoki owner tekshiramiz
+        Optional<WorkspaceUser> optionalWorkspaceUser = workspaceUserRepository.findByWorkspaceIdAndUserId(id, user.getId());
+        if (optionalWorkspaceUser.isPresent()) {
+            WorkspaceUser workspaceUser = optionalWorkspaceUser.get();
+            if (workspaceUser.getWorkspaceRole().getName().equals(WorkspaceRoleName.ROLE_OWNER.name()) || workspaceUser.getWorkspaceRole().getName().equals(WorkspaceRoleName.ROLE_ADMIN.name())) {
+                //admin yoki ownerligini bilganimizdan keyin workspace_rolega nameni qoshamiz qoshamiz
+                //workspaceni id orqali ovolish kere keyin repositoryga save qivotganda bervoraman
+                Optional<Workspace> optionalWorkspace = workSpaceRepository.findById(id);
+                if (optionalWorkspace.isPresent()) {
+                    workspaceRoleRepository.save(new WorkspaceRole(optionalWorkspace.get(), roleName, null));
+                    return new ApiResponse("Successfully " + roleName + " added to workspace role", true);
+                }
+                return new ApiResponse("workspace is not exist", false);
+            }
+            return new ApiResponse("Only owner and admin can add new role to workspace",false);
+        }
+        return new ApiResponse("wrong user id", false);
     }
 }

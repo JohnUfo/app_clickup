@@ -23,37 +23,43 @@ public class WorkspaceController {
 
     @PostMapping
     public HttpEntity<?> addWorkspace(@Valid @RequestBody WorkspaceDto workspaceDto, @CurrentUser User user) {
-        ApiResponse apiResponse = workspaceService.addWorkspace(workspaceDto,user);
-        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
+        ApiResponse apiResponse = workspaceService.addWorkspace(workspaceDto, user);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
     @PutMapping("/{id}")
     public HttpEntity<?> editWorkspace(@PathVariable Long id, @RequestBody WorkspaceDto workspaceDto) {
-        ApiResponse apiResponse = workspaceService.editWorkspace(id,workspaceDto);
-        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
+        ApiResponse apiResponse = workspaceService.editWorkspace(id, workspaceDto);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
     @PutMapping("/changeOwner/{id}")
     public HttpEntity<?> changeOwnerWorkspace(@PathVariable Long id, @RequestParam UUID ownerId) {
-        ApiResponse apiResponse = workspaceService.changeOwnerWorkspace(id,ownerId);
-        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
+        ApiResponse apiResponse = workspaceService.changeOwnerWorkspace(id, ownerId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
     @DeleteMapping("/{id}")
     public HttpEntity<?> deleteWorkspace(@PathVariable Long id) {
         ApiResponse apiResponse = workspaceService.deleteWorkspace(id);
-        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
     @PostMapping("/addOrEditOrRemoveMemberFromWorkspace/{id}")
     public HttpEntity<?> addOrEditOrRemoveMemberFromWorkspace(@PathVariable Long id, @RequestBody MemberDto memberDto) {
-        ApiResponse apiResponse = workspaceService.addOrEditOrRemoveMemberFromWorkspace(id,memberDto);
-        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
+        ApiResponse apiResponse = workspaceService.addOrEditOrRemoveMemberFromWorkspace(id, memberDto);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
     @PutMapping("/join")
     public HttpEntity<?> joinToWorkspace(@RequestParam Long id, @CurrentUser User user) {
-        ApiResponse apiResponse = workspaceService.joinToWorkspace(id,user);
-        return ResponseEntity.status(apiResponse.isSuccess()?200:409).body(apiResponse);
+        ApiResponse apiResponse = workspaceService.joinToWorkspace(id, user);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @PostMapping("/addRole/{id}")//workspaceId
+    public HttpEntity<?> addRoleToWorkspace(@PathVariable Long id, @RequestParam String roleName,@CurrentUser User user) {
+        ApiResponse apiResponse = workspaceService.addRoleToWorkspace(id, roleName,user);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }
