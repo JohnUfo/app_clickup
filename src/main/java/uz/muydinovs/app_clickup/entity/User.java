@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import uz.muydinovs.app_clickup.entity.enums.SystemRoleName;
 import uz.muydinovs.app_clickup.entity.template.AbsUUIDEntity;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -36,6 +37,8 @@ public class User extends AbsUUIDEntity implements UserDetails {
     private Attachment avatar;
 
     private String emailCode;
+
+    private Timestamp lastActiveTime;
 
     private boolean enabled = false;
     private boolean accountNonExpired = true;

@@ -8,4 +8,5 @@ import java.util.UUID;
 
 @Repository
 public interface WorkspaceRoleRepository extends JpaRepository<WorkspaceRole, UUID> {
+    boolean existsByWorkspaceIdAndName(Long workspaceId, String name);
 }

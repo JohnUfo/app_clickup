@@ -4,7 +4,9 @@ import uz.muydinovs.app_clickup.entity.User;
 import uz.muydinovs.app_clickup.payload.ApiResponse;
 import uz.muydinovs.app_clickup.payload.MemberDto;
 import uz.muydinovs.app_clickup.payload.WorkspaceDto;
+import uz.muydinovs.app_clickup.payload.WorkspaceRoleDto;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface WorkspaceService {
@@ -20,5 +22,11 @@ public interface WorkspaceService {
 
     ApiResponse joinToWorkspace(Long id, User user);
 
-    ApiResponse addRoleToWorkspace(Long workspaceId, String roleName,User user);
+    ApiResponse addRoleToWorkspace(Long workspaceId, String roleName, User user);
+
+    List<MemberDto> getMemberAndGuests(Long workspaceId);
+
+    List<WorkspaceDto> getMyWorkspaces(User user);
+
+    ApiResponse addOrRemovePermission(WorkspaceRoleDto workspaceRoleDto);
 }

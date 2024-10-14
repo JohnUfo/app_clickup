@@ -5,11 +5,13 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import uz.muydinovs.app_clickup.entity.*;
+import uz.muydinovs.app_clickup.entity.enums.AddType;
 import uz.muydinovs.app_clickup.entity.enums.WorkspacePermissionName;
 import uz.muydinovs.app_clickup.entity.enums.WorkspaceRoleName;
 import uz.muydinovs.app_clickup.payload.ApiResponse;
 import uz.muydinovs.app_clickup.payload.MemberDto;
 import uz.muydinovs.app_clickup.payload.WorkspaceDto;
+import uz.muydinovs.app_clickup.payload.WorkspaceRoleDto;
 import uz.muydinovs.app_clickup.repository.*;
 
 import java.sql.Timestamp;
@@ -159,14 +161,10 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     public ApiResponse addRoleToWorkspace(Long workspaceId, String roleName, User user) {
-        //workspace user orqali workspacerolni olamiz
-        //new role qoshvotgan odam admin yoki owner tekshiramiz
         Optional<WorkspaceUser> optionalWorkspaceUser = workspaceUserRepository.findByWorkspaceIdAndUserId(workspaceId, user.getId());
         if (optionalWorkspaceUser.isPresent()) {
             WorkspaceUser workspaceUser = optionalWorkspaceUser.get();
             if (workspaceUser.getWorkspaceRole().getName().equals(WorkspaceRoleName.ROLE_OWNER.name()) || workspaceUser.getWorkspaceRole().getName().equals(WorkspaceRoleName.ROLE_ADMIN.name())) {
-                //admin yoki ownerligini bilganimizdan keyin workspace_rolega nameni qoshamiz qoshamiz
-                //workspaceni id orqali ovolish kere keyin repositoryga save qivotganda bervoraman
                 Optional<Workspace> optionalWorkspace = workSpaceRepository.findById(workspaceId);
                 if (optionalWorkspace.isPresent()) {
                     workspaceRoleRepository.save(new WorkspaceRole(optionalWorkspace.get(), roleName, null));
@@ -178,4 +176,59 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         }
         return new ApiResponse("wrong user id", false);
     }
+
+    @Override
+    public List<MemberDto> getMemberAndGuests(Long workspaceId) {
+        List<WorkspaceUser> workspaceUsers = workspaceUserRepository.findAllByWorkspaceId(workspaceId);
+        return workspaceUsers.stream().map(this::mapWorkspaceUserToMemberDto).toList();
+    }
+
+    @Override
+    public List<WorkspaceDto> getMyWorkspaces(User user) {
+        List<WorkspaceUser> workspaceUsers = workspaceUserRepository.findAllByUserId(user.getId());
+        return workspaceUsers.stream().map(workspaceUser -> mapWorkspaceUserToWorkspaceDto(workspaceUser.getWorkspace())).toList();
+    }
+
+    @Override
+    public ApiResponse addOrRemovePermission(WorkspaceRoleDto workspaceRoleDto) {
+        WorkspaceRole workspaceRole = workspaceRoleRepository.findById(workspaceRoleDto.getId()).orElseThrow(() -> new ResourceNotFoundException("workspaceRole"));
+        Optional<WorkspacePermission> optionalWorkspacePermission = workspacePermissionRepository.findByWorkspaceRoleIdAndPermission(workspaceRole.getId(), workspaceRoleDto.getPermissionName());
+        if (workspaceRoleDto.getAddType().equals(AddType.ADD)) {
+            if (optionalWorkspacePermission.isPresent()) return new ApiResponse("Permission already added", false);
+            WorkspacePermission workspacePermission = new WorkspacePermission(workspaceRole, workspaceRoleDto.getPermissionName());
+            workspacePermissionRepository.save(workspacePermission);
+            return new ApiResponse("Permission added", true);
+
+        } else if (workspaceRoleDto.getAddType().equals(AddType.REMOVE)) {
+            if (optionalWorkspacePermission.isPresent()) {
+                workspacePermissionRepository.delete(optionalWorkspacePermission.get());
+                return new ApiResponse("Permission removed", true);
+            }
+            return new ApiResponse("no object found", false);
+        }
+        return new ApiResponse("wrong permission", false);
+    }
+
+    public MemberDto mapWorkspaceUserToMemberDto(WorkspaceUser workspaceUser) {
+        MemberDto memberDto = new MemberDto();
+        memberDto.setId(workspaceUser.getUser().getId());
+        memberDto.setFullName(workspaceUser.getUser().getFullName());
+        memberDto.setEmail(workspaceUser.getUser().getEmail());
+        memberDto.setRoleName(workspaceUser.getWorkspaceRole().getName());
+        memberDto.setLastActive(workspaceUser.getUser().getLastActiveTime());
+        return memberDto;
+    }
+
+    public WorkspaceDto mapWorkspaceUserToWorkspaceDto(Workspace workspace) {
+        WorkspaceDto workspaceDto = new WorkspaceDto();
+        workspaceDto.setId(workspace.getId());
+        workspaceDto.setName(workspace.getName());
+        workspaceDto.setInitialLetter(workspace.getInitialLetter());
+        workspaceDto.setOwnerId(workspace.getOwner().getId());
+        workspaceDto.setColor(workspace.getColor());
+        workspaceDto.setAvatarId(workspace.getAvatar() == null ? null : workspace.getAvatar().getId());
+        return workspaceDto;
+    }
 }
+
+

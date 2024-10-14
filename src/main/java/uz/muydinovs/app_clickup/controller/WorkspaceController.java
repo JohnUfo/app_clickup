@@ -9,9 +9,12 @@ import uz.muydinovs.app_clickup.entity.User;
 import uz.muydinovs.app_clickup.payload.ApiResponse;
 import uz.muydinovs.app_clickup.payload.MemberDto;
 import uz.muydinovs.app_clickup.payload.WorkspaceDto;
+import uz.muydinovs.app_clickup.payload.WorkspaceRoleDto;
+import uz.muydinovs.app_clickup.repository.WorkSpaceRepository;
 import uz.muydinovs.app_clickup.security.CurrentUser;
 import uz.muydinovs.app_clickup.service.WorkspaceService;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -20,6 +23,8 @@ public class WorkspaceController {
 
     @Autowired
     WorkspaceService workspaceService;
+    @Autowired
+    private WorkSpaceRepository workSpaceRepository;
 
     @PostMapping
     public HttpEntity<?> addWorkspace(@Valid @RequestBody WorkspaceDto workspaceDto, @CurrentUser User user) {
@@ -61,5 +66,24 @@ public class WorkspaceController {
     public HttpEntity<?> addRoleToWorkspace(@PathVariable Long workspaceId, @RequestParam String roleName,@CurrentUser User user) {
         ApiResponse apiResponse = workspaceService.addRoleToWorkspace(workspaceId, roleName,user);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @GetMapping("/member/{workspaceId}")
+    public HttpEntity<?> getMemberAndGuests(@PathVariable Long workspaceId) {
+        List<MemberDto> members = workspaceService.getMemberAndGuests(workspaceId);
+        return ResponseEntity.ok(members);
+    }
+
+    @GetMapping
+    public HttpEntity<?> getMyWorkspaces(@CurrentUser User user) {
+        List<WorkspaceDto> workspaces = workspaceService.getMyWorkspaces(user);
+        return ResponseEntity.ok(workspaces);
+    }
+
+    @PutMapping("/addOrRemovePermission")
+    public HttpEntity<?> addOrRemovePermissionToRole(@RequestBody WorkspaceRoleDto workspaceRoleDto){
+        ApiResponse apiResponse = workspaceService.addOrRemovePermission(workspaceRoleDto);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+
     }
 }
