@@ -1,5 +1,6 @@
 package uz.muydinovs.app_clickup.payload;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MemberDto {
     public MemberDto(UUID id, UUID roleId, AddType addType) {
         this.id = id;
