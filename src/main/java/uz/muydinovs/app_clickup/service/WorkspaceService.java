@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface WorkspaceService {
     ApiResponse addWorkspace(WorkspaceDto workspaceDto, User user);
 
-    ApiResponse editWorkspace(Long workspaceId, WorkspaceDto workspaceDto, User user);
+    ApiResponse editWorkspace(WorkspaceDto workspaceDto);
 
     ApiResponse changeOwnerWorkspace(Long workspaceId, UUID ownerId, User user);
 

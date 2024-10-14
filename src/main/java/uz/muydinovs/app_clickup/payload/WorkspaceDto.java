@@ -26,6 +26,13 @@ public class WorkspaceDto {
 
     private String initialLetter;
 
+    public WorkspaceDto(Long id, String name, String color, UUID ownerId) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
+        this.ownerId = ownerId;
+    }
+
     public WorkspaceDto(String name, String color, UUID avatarId) {
         this.name = name;
         this.color = color;
