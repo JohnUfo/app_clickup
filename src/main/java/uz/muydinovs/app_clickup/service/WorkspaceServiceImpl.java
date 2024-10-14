@@ -187,9 +187,14 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public List<MemberDto> getMemberAndGuests(Long workspaceId) {
+    public ApiResponse getMemberAndGuests(Long workspaceId, User user) {
         List<WorkspaceUser> workspaceUsers = workspaceUserRepository.findAllByWorkspaceId(workspaceId);
-        return workspaceUsers.stream().map(this::mapWorkspaceUserToMemberDto).toList();
+
+        for (WorkspaceUser workspaceUser : workspaceUsers) {
+            if (user.getEmail().equals(workspaceUser.getUser().getEmail()))
+                return new ApiResponse("UsersList",true,workspaceUsers.stream().map(this::mapWorkspaceUserToMemberDto).toList());
+        }
+        return new ApiResponse("User not found", false);
     }
 
     @Override

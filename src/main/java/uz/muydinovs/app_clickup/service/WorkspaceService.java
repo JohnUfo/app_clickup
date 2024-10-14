@@ -24,7 +24,7 @@ public interface WorkspaceService {
 
     ApiResponse addRoleToWorkspace(Long workspaceId, WorkspaceRoleDto workspaceRoleDto, User user);
 
-    List<MemberDto> getMemberAndGuests(Long workspaceId);
+    ApiResponse getMemberAndGuests(Long workspaceId, User user);
 
     List<WorkspaceDto> getMyWorkspaces(User user);
 

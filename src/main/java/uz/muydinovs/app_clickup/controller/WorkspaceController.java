@@ -66,10 +66,12 @@ public class WorkspaceController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    //shu workspaceda bogan odamla kora olishi kere buning uchun
+    // current user qoshish kere uni worksapce id sini olish kere
     @GetMapping("/member/{workspaceId}")
-    public HttpEntity<?> getMemberAndGuests(@PathVariable Long workspaceId) {
-        List<MemberDto> members = workspaceService.getMemberAndGuests(workspaceId);
-        return ResponseEntity.ok(members);
+    public HttpEntity<?> getMemberAndGuests(@PathVariable Long workspaceId,@CurrentUser User user) {
+        ApiResponse memberAndGuests = workspaceService.getMemberAndGuests(workspaceId, user);
+        return ResponseEntity.ok(memberAndGuests);
     }
 
     @GetMapping
