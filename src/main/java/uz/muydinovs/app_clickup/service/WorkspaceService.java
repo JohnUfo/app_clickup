@@ -22,7 +22,7 @@ public interface WorkspaceService {
 
     ApiResponse joinToWorkspace(Long id, User user);
 
-    ApiResponse addRoleToWorkspace(Long workspaceId, String roleName, User user);
+    ApiResponse addRoleToWorkspace(Long workspaceId, WorkspaceRoleDto workspaceRoleDto, User user);
 
     List<MemberDto> getMemberAndGuests(Long workspaceId);
 

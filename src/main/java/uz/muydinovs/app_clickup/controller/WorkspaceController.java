@@ -23,8 +23,6 @@ public class WorkspaceController {
 
     @Autowired
     WorkspaceService workspaceService;
-    @Autowired
-    private WorkSpaceRepository workSpaceRepository;
 
     @PostMapping
     public HttpEntity<?> addWorkspace(@Valid @RequestBody WorkspaceDto workspaceDto, @CurrentUser User user) {
@@ -63,8 +61,8 @@ public class WorkspaceController {
     }
 
     @PostMapping("/addRole/{workspaceId}")//workspaceId
-    public HttpEntity<?> addRoleToWorkspace(@PathVariable Long workspaceId, @RequestParam String roleName,@CurrentUser User user) {
-        ApiResponse apiResponse = workspaceService.addRoleToWorkspace(workspaceId, roleName,user);
+    public HttpEntity<?> addRoleToWorkspace(@PathVariable Long workspaceId, @RequestBody WorkspaceRoleDto workspaceRoleDto,@CurrentUser User user) {
+        ApiResponse apiResponse = workspaceService.addRoleToWorkspace(workspaceId, workspaceRoleDto,user);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

@@ -16,7 +16,13 @@ public class WorkspaceRoleDto {
 
     private UUID id;
     private String name;
-    private WorkspaceRoleName workspaceRoleName;
+
+    public WorkspaceRoleDto(String name, WorkspaceRoleName extendsRole) {
+        this.name = name;
+        this.extendsRole = extendsRole;
+    }
+
+    private WorkspaceRoleName extendsRole;
     private WorkspacePermissionName permissionName;
     private AddType addType;
 }

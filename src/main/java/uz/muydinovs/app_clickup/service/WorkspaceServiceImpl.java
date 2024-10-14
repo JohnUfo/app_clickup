@@ -160,15 +160,27 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public ApiResponse addRoleToWorkspace(Long workspaceId, String roleName, User user) {
+    public ApiResponse addRoleToWorkspace(Long workspaceId, WorkspaceRoleDto workspaceRoleDto, User user) {
         Optional<WorkspaceUser> optionalWorkspaceUser = workspaceUserRepository.findByWorkspaceIdAndUserId(workspaceId, user.getId());
         if (optionalWorkspaceUser.isPresent()) {
             WorkspaceUser workspaceUser = optionalWorkspaceUser.get();
             if (workspaceUser.getWorkspaceRole().getName().equals(WorkspaceRoleName.ROLE_OWNER.name()) || workspaceUser.getWorkspaceRole().getName().equals(WorkspaceRoleName.ROLE_ADMIN.name())) {
                 Optional<Workspace> optionalWorkspace = workSpaceRepository.findById(workspaceId);
                 if (optionalWorkspace.isPresent()) {
-                    workspaceRoleRepository.save(new WorkspaceRole(optionalWorkspace.get(), roleName, null));
-                    return new ApiResponse("Successfully " + roleName + " added to workspace role", true);
+                    WorkspaceRole workspaceRole = workspaceRoleRepository.save(new WorkspaceRole(optionalWorkspace.get(), workspaceRoleDto.getName(), workspaceRoleDto.getExtendsRole()));
+                    List<WorkspacePermission> workspacePermissions = workspacePermissionRepository.findAllByWorkspaceRole_NameAndWorkspaceRole_WorkspaceId(workspaceRoleDto.getExtendsRole().name(), workspaceId);
+
+                    List<WorkspacePermission> newWorkspacePermissions = new ArrayList<>();
+                    for (WorkspacePermission workspacePermission : workspacePermissions) {
+                        WorkspacePermission newWorkspacePermission = new WorkspacePermission(
+                                workspaceRole,
+                                workspacePermission.getPermission()
+
+                        );
+                        newWorkspacePermissions.add(newWorkspacePermission);
+                    }
+                    workspacePermissionRepository.saveAll(newWorkspacePermissions);
+                    return new ApiResponse("Successfully " + workspaceRoleDto.getName() + " added to workspace role", true);
                 }
                 return new ApiResponse("workspace is not exist", false);
             }
